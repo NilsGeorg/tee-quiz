@@ -21,5 +21,9 @@
     "psr/http-server-middleware": "^1.0",
     "ext-json": "*",
     "rbdwllr/reallysimplejwt": "^5.0"
+  },
+  "scripts": {
+    "start": "php -S localhost:8001 -t public",
+    "test": "./vendor/bin/phpunit tests"
   }
 }

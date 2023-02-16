@@ -24,10 +24,12 @@ class SessionStorage
         $this->SESSION = $this->storageService->load(self::FILENAME);
     }
 
-    public function resetQuiz()
+    public function resetQuiz(): bool
     {
         unset($this->SESSION[self::LAST_QUESTION_ORDER]);
         unset($this->SESSION[self::ANSWER]);
+
+        return true;
     }
 
     /**

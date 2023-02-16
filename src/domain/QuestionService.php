@@ -11,11 +11,13 @@ class QuestionService
     private QuestionRepository $questionRepository;
     private SessionStorage $sessionStorage;
 
-    public function __construct()
+    public function __construct(
+        $questionRepository = new QuestionRepository(),
+        $sessionStorage = new SessionStorage())
     {
         // would normally do this with DI, but in this small example this should be sufficient
-        $this->questionRepository = new QuestionRepository();
-        $this->sessionStorage = new SessionStorage();
+        $this->questionRepository = $questionRepository;
+        $this->sessionStorage = $sessionStorage;
     }
 
     public function start(): QuestionEntity
