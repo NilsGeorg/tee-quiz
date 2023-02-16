@@ -13,8 +13,8 @@ class QuestionServiceTest extends TestCase
 
     public function testStart(): void
     {
-        $questionMock = $this->getQuestionRepositoryMock();
-        $sessionStorageMock = $this->getSessionStorageMock();
+        $questionMock = $this->createMock(QuestionRepository::class);
+        $sessionStorageMock = $this->createMock(SessionStorage::class);
 
         $questionEntityMock = new QuestionEntity('test', array(), 1);
 
@@ -28,13 +28,88 @@ class QuestionServiceTest extends TestCase
         $this->assertEquals($question, $questionEntityMock);
     }
 
-    private function getQuestionRepositoryMock()
+    public function testAnswer(): void
     {
-        return $this->createMock(QuestionRepository::class);
+        $questionMock = $this->createMock(QuestionRepository::class);
+        $sessionStorageMock = $this->createMock(SessionStorage::class);
+
+        $sessionStorageMock
+            ->expects($this->once())
+            ->method('getCurrentQuestionNumber')
+            ->willReturn(1);
+        $sessionStorageMock
+            ->expects($this->once())
+            ->method('addAnswer');
+
+        $questionService = new QuestionService($questionMock, $sessionStorageMock);
+
+        $questionService->answer(array('123', '456'));
     }
 
-    private function getSessionStorageMock()
+    public function testGetNextQuestionNumberWithoutOrder(): void
     {
-        return $this->createMock(SessionStorage::class);
+        $questionMock = $this->createMock(QuestionRepository::class);
+        $sessionStorageMock = $this->createMock(SessionStorage::class);
+        $questionEntityMock = new QuestionEntity('test', array(), 1);
+
+        $sessionStorageMock
+            ->expects($this->once())
+            ->method('getCurrentQuestionNumber')
+            ->willReturn(null);
+        $questionMock
+            ->expects($this->once())
+            ->method('findFirstQuestion')
+            ->willReturn($questionEntityMock);
+
+        $questionService = new QuestionService($questionMock, $sessionStorageMock);
+
+        $question = $questionService->getNextQuestion();
+
+        $this->assertEquals($question, $questionEntityMock);
+    }
+
+    public function testGetNextQuestionNumberWithOrder(): void
+    {
+        $questionMock = $this->createMock(QuestionRepository::class);
+        $sessionStorageMock = $this->createMock(SessionStorage::class);
+        $questionEntityMock = new QuestionEntity('test', array(), 1);
+
+        $sessionStorageMock
+            ->expects($this->once())
+            ->method('getCurrentQuestionNumber')
+            ->willReturn(1);
+        $questionMock
+            ->expects($this->once())
+            ->method('findNextQuestion')
+            ->with(1)
+            ->willReturn($questionEntityMock);
+
+        $questionService = new QuestionService($questionMock, $sessionStorageMock);
+
+        $question = $questionService->getNextQuestion();
+
+        $this->assertEquals($question, $questionEntityMock);
+    }
+
+    public function testGetNextQuestionNumberNotFound(): void
+    {
+        $questionMock = $this->createMock(QuestionRepository::class);
+        $sessionStorageMock = $this->createMock(SessionStorage::class);
+
+        $sessionStorageMock
+            ->expects($this->once())
+            ->method('getCurrentQuestionNumber')
+            ->willReturn(1);
+        $questionMock
+            ->expects($this->once())
+            ->method('findNextQuestion')
+            ->with(1)
+            ->willReturn(null);
+
+        $questionService = new QuestionService($questionMock, $sessionStorageMock);
+
+        $question = $questionService->getNextQuestion();
+
+        $this->assertNull($question);
     }
 }
