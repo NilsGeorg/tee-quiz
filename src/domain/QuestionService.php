@@ -11,20 +11,18 @@ class QuestionService
     private QuestionRepository $questionRepository;
     private SessionStorage $sessionStorage;
 
-    public function __construct(
-        $questionRepository = new QuestionRepository(),
-        $sessionStorage = new SessionStorage())
+    public function __construct(QuestionRepository $questionRepository = new QuestionRepository())
     {
         // would normally do this with DI, but in this small example this should be sufficient
         $this->questionRepository = $questionRepository;
-        $this->sessionStorage = $sessionStorage;
+        $this->sessionStorage = new SessionStorage();
     }
 
     public function start(): QuestionEntity
     {
-        $this->sessionStorage->resetQuiz();
+//        $this->sessionStorage->resetQuiz();
 
-        return $this->questionRepository->findFirstQuestion();
+        return $this->questionRepository->findFirst();
     }
 
     public function answer(array $answerIds): void
@@ -52,9 +50,9 @@ class QuestionService
          * @var $nextQuestion QuestionEntity
          */
         if ($currentQuestionOrder === null) {
-            $nextQuestion = $this->questionRepository->findFirstQuestion();
+            $nextQuestion = $this->questionRepository->findFirst();
         } else {
-            $nextQuestion = $this->questionRepository->findNextQuestion($currentQuestionOrder);
+            $nextQuestion = $this->questionRepository->findNext($currentQuestionOrder);
         }
 
         return $nextQuestion;

@@ -2,27 +2,22 @@
 
 namespace Nils\QuizTee\persistence\entity;
 
-/**
- * In real world the answers should contain a reference to the Question. Also they should have an index (like a, b, c).
- * With this index number and the question_id there should be a foreign key constraint so each question can only have
- * on index a and so on. Then there would be no need in presenting the answer id to the world and also checking the
- * answers would be much easier.
- */
-final class AnswerEntity extends BaseEntity
-{
-    private string $answer;
-    private bool $isCorrect;
+use Doctrine\ORM\Mapping as ORM;
 
-    /**
-     * @param string $answer
-     * @param bool $isCorrect
-     */
-    public function __construct(string $answer, bool $isCorrect)
-    {
-        parent::__construct();
-        $this->answer = $answer;
-        $this->isCorrect = $isCorrect;
-    }
+#[ORM\Entity]
+#[ORM\Table(name: 'answer')]
+#[ORM\UniqueConstraint(columns: ['question_id', 'orderIndex'])]
+class AnswerEntity extends BaseEntity
+{
+    #[ORM\Column(type: 'string')]
+    private string $answer;
+    #[ORM\Column(type: 'boolean')]
+    private bool $isCorrect;
+    #[ORM\Column(type: 'integer')]
+    private int $orderIndex;
+
+    #[ORM\ManyToOne(targetEntity: QuestionEntity::class, inversedBy: 'answers')]
+    private QuestionEntity $question;
 
     /**
      * @return string
@@ -54,5 +49,37 @@ final class AnswerEntity extends BaseEntity
     public function setIsCorrect(bool $isCorrect): void
     {
         $this->isCorrect = $isCorrect;
+    }
+
+    /**
+     * @return int
+     */
+    public function getOrderIndex(): int
+    {
+        return $this->orderIndex;
+    }
+
+    /**
+     * @param int $orderIndex
+     */
+    public function setOrderIndex(int $orderIndex): void
+    {
+        $this->orderIndex = $orderIndex;
+    }
+
+    /**
+     * @return QuestionEntity
+     */
+    public function getQuestion(): QuestionEntity
+    {
+        return $this->question;
+    }
+
+    /**
+     * @param QuestionEntity $question
+     */
+    public function setQuestion(QuestionEntity $question): void
+    {
+        $this->question = $question;
     }
 }

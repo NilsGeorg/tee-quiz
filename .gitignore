@@ -1,3 +1,5 @@
 /vendor
 /.idea
 /docker/mysql/database
+ngeorg_*
+/docker/mariadb/database

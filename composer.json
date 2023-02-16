@@ -8,6 +8,11 @@
   "autoload": {
     "psr-4": {
       "Nils\\QuizTee\\": "src/"
+    },
+    "autoload": {
+      "psr-0": {
+        "": "src/"
+      }
     }
   },
   "authors": [
@@ -20,7 +25,13 @@
     "pecee/simple-router": "5.0.0.3",
     "psr/http-server-middleware": "^1.0",
     "ext-json": "*",
-    "rbdwllr/reallysimplejwt": "^5.0"
+    "rbdwllr/reallysimplejwt": "^5.0",
+    "doctrine/orm": "^2.14.0",
+    "doctrine/dbal": "^2.12",
+    "symfony/yaml": "^5.4",
+    "symfony/cache": "^5.4",
+    "ramsey/uuid-doctrine": "^2.0",
+    "ramsey/uuid": "^4.7"
   },
   "scripts": {
     "start": "php -S localhost:8001 -t public",

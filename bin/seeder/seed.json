@@ -1,0 +1,95 @@
+[
+  {
+    "question": "A byte is comprised of how many bits?",
+    "answers": [
+      {
+        "isCorrect": false,
+        "answer": "2"
+      },
+      {
+        "isCorrect": false,
+        "answer": "4"
+      },
+      {
+        "isCorrect": true,
+        "answer": "8"
+      }
+    ]
+  },
+  {
+    "question": "What is H<sup>2</sup>O?",
+    "answers": [
+      {
+        "isCorrect": true,
+        "answer": "Water"
+      },
+      {
+        "isCorrect": false,
+        "answer": "Helium"
+      },
+      {
+        "isCorrect": false,
+        "answer": "Oxygen"
+      }
+    ]
+  },
+  {
+    "question": "What is H<sup>2</sup>O comprised of?",
+    "answers": [
+      {
+        "isCorrect": false,
+        "answer": "Nitrogen"
+      },
+      {
+        "isCorrect": true,
+        "answer": "Hydrogen"
+      },
+      {
+        "isCorrect": false,
+        "answer": "Carbon dioxide"
+      },
+      {
+        "isCorrect": false,
+        "answer": "Oxygen"
+      }
+    ]
+  },
+  {
+    "question": "Your heart pumps blood. Correct?",
+    "answers": [
+      {
+        "isCorrect": true,
+        "answer": "Yes"
+      },
+      {
+        "isCorrect": false,
+        "answer": "No"
+      }
+    ]
+  },
+  {
+    "question": "Where can you find an Eiffel Tower? Both original and replicas are valid.",
+    "answers": [
+      {
+        "isCorrect": true,
+        "answer": "Tokyo"
+      },
+      {
+        "isCorrect": false,
+        "answer": "Berlin"
+      },
+      {
+        "isCorrect": false,
+        "answer": "Dubai"
+      },
+      {
+        "isCorrect": true,
+        "answer": "Paris"
+      },
+      {
+        "isCorrect": true,
+        "answer": "Las Vegas"
+      }
+    ]
+  }
+]

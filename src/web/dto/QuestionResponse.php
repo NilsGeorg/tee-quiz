@@ -8,9 +8,7 @@ use Nils\QuizTee\web\AbstractResponse;
 class QuestionResponse extends AbstractResponse
 {
     protected string $question;
-    /**
-     * @var AnswerResponse[]
-     */
+
     protected array $answers;
 
     public function __construct(QuestionEntity $questionEntity)

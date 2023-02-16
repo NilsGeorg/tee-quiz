@@ -1,0 +1,14 @@
+version: '3.3'
+services:
+  db:
+    image: mariadb:10
+    restart: always
+    environment:
+      MARIADB_DATABASE: 'tee-quiz'
+      MARIADB_USER: 'quizzer'
+      MARIADB_PASSWORD: 'QUIZ123'
+      MARIADB_ROOT_PASSWORD: '321ZIUQ'
+    ports:
+      - '3306:3306'
+    volumes:
+      - ./docker/mariadb/database:/var/lib/mysql

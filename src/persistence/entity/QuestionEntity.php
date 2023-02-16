@@ -2,27 +2,22 @@
 
 namespace Nils\QuizTee\persistence\entity;
 
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+use Nils\QuizTee\persistence\repository\QuestionRepository;
+
+#[ORM\Entity(repositoryClass: QuestionRepository::class)]
+#[ORM\Table(name: 'question')]
 final class QuestionEntity extends BaseEntity
 {
+    #[ORM\Column(type: 'string')]
     private string $question;
 
-    // Should be an array collection
-    private array $answers;
+    #[ORM\Column(type: 'integer', unique: true)]
+    private int $orderIndex;
 
-    // This should be unique and have an incrementing order
-    private int $order;
-
-    /**
-     * @param string $question
-     * @param array $answers
-     */
-    public function __construct(string $question, array $answers, int $order)
-    {
-        parent::__construct();
-        $this->question = $question;
-        $this->answers = $answers;
-        $this->order = $order;
-    }
+    #[ORM\OneToMany(mappedBy: 'question', targetEntity: AnswerEntity::class)]
+    private Collection $answers;
 
     /**
      * @return string
@@ -41,34 +36,34 @@ final class QuestionEntity extends BaseEntity
     }
 
     /**
-     * @return array
+     * @return int
      */
-    public function getAnswers(): array
+    public function getOrderIndex(): int
+    {
+        return $this->orderIndex;
+    }
+
+    /**
+     * @param int $orderIndex
+     */
+    public function setOrderIndex(int $orderIndex): void
+    {
+        $this->orderIndex = $orderIndex;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getAnswers(): Collection
     {
         return $this->answers;
     }
 
     /**
-     * @param array $answers
+     * @param Collection $answers
      */
-    public function setAnswers(array $answers): void
+    public function setAnswers(Collection $answers): void
     {
         $this->answers = $answers;
-    }
-
-    /**
-     * @return int
-     */
-    public function getOrder(): int
-    {
-        return $this->order;
-    }
-
-    /**
-     * @param int $order
-     */
-    public function setOrder(int $order): void
-    {
-        $this->order = $order;
     }
 }

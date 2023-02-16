@@ -2,80 +2,35 @@
 
 namespace Nils\QuizTee\persistence\repository;
 
-use Nils\QuizTee\persistence\entity\AnswerEntity;
 use Nils\QuizTee\persistence\entity\QuestionEntity;
+use Ramsey\Uuid\Uuid;
 
-class QuestionRepository
+class QuestionRepository extends AbstractRepository
 {
-
-    // TODO: Save questions as Json String and load to object so ids don't change
-    private string $jsonQuestions = '{"id":"63ee3c6cf29be","question":"1 + 1","answers":[{"id":"63ee3c6cf29bb","answer":"1"},{"id":"63ee3c6cf29bd","answer":"2"}]}';
-    /**
-     * @var QuestionEntity[]
-     */
-    private array $questions;
-
     public function __construct()
     {
-        $this->questions = $this->generateQuestions();
+        parent::__construct(QuestionEntity::class);
     }
 
-    public function findFirstQuestion(): QuestionEntity
+    protected string $className = QuestionEntity::class;
+
+    public function findFirst(): QuestionEntity
     {
-        return $this->questions[0];
+        return $this->findOneBy(['orderIndex' => '1']);
     }
 
-    public function findAllQuestion(): array
+    public function findAll(): array
     {
-        return $this->questions;
+        return $this->findBy([], ['orderIndex' => 'ASC']);
     }
 
-    public function findQuestionById(string $uuid): ?QuestionEntity
+    public function findById(Uuid $id): ?QuestionEntity
     {
-        foreach ($this->questions as $question) {
-            if ($question->getId() === $uuid) {
-                return $question;
-            }
-        }
-
-        return null;
+        return $this->find($id);
     }
 
-    public function findNextQuestion(int $current): ?QuestionEntity
+    public function findNext(int $current): ?QuestionEntity
     {
-        // this is not really save as if we skip some numbers we would end with an empty result
-        foreach ($this->questions as $question) {
-            if ($question->getOrder() === $current + 1) {
-                return $question;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @return QuestionEntity[]
-     */
-    private function generateQuestions(): array
-    {
-        // could be some json decode
-        return array(
-            new QuestionEntity(
-                '1 + 1',
-                array(
-                    new AnswerEntity('1', false),
-                    new AnswerEntity('2', true)
-                ),
-                1
-            ), new QuestionEntity(
-                '2 + 2',
-                array(
-                    new AnswerEntity('3', false),
-                    new AnswerEntity('4', true)
-                ),
-                2
-            )
-        );
-
+        return $this->findOneBy(['queryIndex' => $current + 1]);
     }
 }

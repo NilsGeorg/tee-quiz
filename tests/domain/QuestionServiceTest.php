@@ -16,9 +16,9 @@ class QuestionServiceTest extends TestCase
         $questionMock = $this->createMock(QuestionRepository::class);
         $sessionStorageMock = $this->createMock(SessionStorage::class);
 
-        $questionEntityMock = new QuestionEntity('test', array(), 1);
+        $questionEntityMock = new QuestionEntity();
 
-        $questionMock->expects($this->once())->method('findFirstQuestion')->willReturn($questionEntityMock);
+        $questionMock->expects($this->once())->method('findFirst')->willReturn($questionEntityMock);
         $sessionStorageMock->expects($this->once())->method('resetQuiz')->willReturn(true);
 
         $questionService = new QuestionService($questionMock, $sessionStorageMock);
@@ -58,7 +58,7 @@ class QuestionServiceTest extends TestCase
             ->willReturn(null);
         $questionMock
             ->expects($this->once())
-            ->method('findFirstQuestion')
+            ->method('findFirst')
             ->willReturn($questionEntityMock);
 
         $questionService = new QuestionService($questionMock, $sessionStorageMock);
@@ -80,7 +80,7 @@ class QuestionServiceTest extends TestCase
             ->willReturn(1);
         $questionMock
             ->expects($this->once())
-            ->method('findNextQuestion')
+            ->method('findNext')
             ->with(1)
             ->willReturn($questionEntityMock);
 
@@ -102,7 +102,7 @@ class QuestionServiceTest extends TestCase
             ->willReturn(1);
         $questionMock
             ->expects($this->once())
-            ->method('findNextQuestion')
+            ->method('findNext')
             ->with(1)
             ->willReturn(null);
 

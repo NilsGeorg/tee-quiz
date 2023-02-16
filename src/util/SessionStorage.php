@@ -19,9 +19,9 @@ class SessionStorage
 
     public function __construct()
     {
-        $this->storageService = new StorageService();
+//        $this->storageService = new StorageService();
 
-        $this->SESSION = $this->storageService->load(self::FILENAME);
+//        $this->SESSION = $this->storageService->load(self::FILENAME);
     }
 
     public function resetQuiz(): bool

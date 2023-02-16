@@ -5,6 +5,7 @@ use Nils\QuizTee\web\Middleware;
 use Nils\QuizTee\web\QuestionController;
 use Pecee\SimpleRouter\SimpleRouter;
 
+
 SimpleRouter::get('login/{user}', [AuthController::class, 'login']);
 
 SimpleRouter::group(['middleware' => Middleware::class, 'prefix' => 'question'], function () {

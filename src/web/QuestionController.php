@@ -2,6 +2,8 @@
 
 namespace Nils\QuizTee\web;
 
+use DI\Attribute\Inject;
+use DI\Attribute\Injectable;
 use Nils\QuizTee\domain\QuestionService;
 use Nils\QuizTee\web\dto\QuestionResponse;
 
@@ -10,9 +12,9 @@ class QuestionController
 
     protected QuestionService $questionService;
 
-    public function __construct()
+    public function __construct(QuestionService $questionService = new QuestionService())
     {
-        $this->questionService = new QuestionService();
+        $this->questionService = $questionService;
     }
 
     public function start(): string
