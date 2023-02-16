@@ -1,0 +1,25 @@
+{
+  "name": "nils/quiz-tee",
+  "type": "project",
+  "require-dev": {
+    "phpunit/phpunit": "^10.0"
+  },
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Nils\\QuizTee\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Nils Georg",
+      "email": "22613459+NilsGeorg@users.noreply.github.com"
+    }
+  ],
+  "require": {
+    "pecee/simple-router": "5.0.0.3",
+    "psr/http-server-middleware": "^1.0",
+    "ext-json": "*",
+    "rbdwllr/reallysimplejwt": "^5.0"
+  }
+}
