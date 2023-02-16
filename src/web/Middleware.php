@@ -3,6 +3,7 @@
 namespace Nils\QuizTee\web;
 
 
+use Nils\QuizTee\exception\UnauthorizedHttpException;
 use Pecee\Http\Middleware\IMiddleware;
 use Pecee\Http\Request;
 
@@ -11,10 +12,22 @@ use Pecee\Http\Request;
  */
 class Middleware implements IMiddleware
 {
+    private const HEADER_API_KEY = 'http-x-api-key';
+
     public function handle(Request $request): void
     {
-        if (input('api-key') !== null) {
-            $_SESSION['TOKEN'] = input('api-key');
+        self::getApiKey($request);
+    }
+
+    // TODO: Move into 'security' class
+    public static function getApiKey(Request $request): string
+    {
+        $apiKey = $request->getHeader(self::HEADER_API_KEY);
+
+        if ($apiKey === null) {
+            throw new UnauthorizedHttpException();
         }
+
+        return $apiKey;
     }
 }

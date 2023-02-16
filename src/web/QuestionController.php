@@ -2,24 +2,31 @@
 
 namespace Nils\QuizTee\web;
 
-use DI\Attribute\Inject;
-use DI\Attribute\Injectable;
 use Nils\QuizTee\domain\QuestionService;
+use Nils\QuizTee\exception\UnauthorizedHttpException;
+use Nils\QuizTee\persistence\entity\TokenEntity;
+use Nils\QuizTee\persistence\repository\TokenRepository;
 use Nils\QuizTee\web\dto\QuestionResponse;
 
 class QuestionController
 {
 
     protected QuestionService $questionService;
+    protected TokenRepository $tokenRepository;
 
-    public function __construct(QuestionService $questionService = new QuestionService())
+    public function __construct(
+        QuestionService $questionService = new QuestionService(),
+        TokenRepository $tokenRepository = new TokenRepository()
+    )
     {
         $this->questionService = $questionService;
+        $this->tokenRepository = $tokenRepository;
     }
 
     public function start(): string
     {
-        $question = $this->questionService->start();
+        $question = $this->questionService->start($this->getToken());
+
         return json_encode(new QuestionResponse($question), true);
     }
 
@@ -56,5 +63,17 @@ class QuestionController
     public function summary()
     {
         // Todo: Calculate points and print the answers
+    }
+
+    private function getToken(): TokenEntity
+    {
+        $jwt = Middleware::getApiKey(request());
+
+        $token = $this->tokenRepository->findOneBy(['jwt' => $jwt]);
+        if ($token === null) {
+            throw new UnauthorizedHttpException();
+        }
+
+        return $token;
     }
 }

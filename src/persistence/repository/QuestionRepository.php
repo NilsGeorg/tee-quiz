@@ -12,8 +12,6 @@ class QuestionRepository extends AbstractRepository
         parent::__construct(QuestionEntity::class);
     }
 
-    protected string $className = QuestionEntity::class;
-
     public function findFirst(): QuestionEntity
     {
         return $this->findOneBy(['orderIndex' => '1']);

@@ -2,27 +2,63 @@
 
 namespace Nils\QuizTee\domain;
 
+use Nils\QuizTee\exception\QuizAlreadyInProgressException;
+use Nils\QuizTee\exception\UnauthorizedHttpException;
 use Nils\QuizTee\persistence\entity\QuestionEntity;
+use Nils\QuizTee\persistence\entity\SessionEntity;
+use Nils\QuizTee\persistence\entity\SessionQuestionEntity;
+use Nils\QuizTee\persistence\entity\TokenEntity;
 use Nils\QuizTee\persistence\repository\QuestionRepository;
-use Nils\QuizTee\util\SessionStorage;
+use Nils\QuizTee\persistence\repository\SessionQuestionRepository;
+use Nils\QuizTee\persistence\repository\SessionRepository;
+use Nils\QuizTee\persistence\repository\TokenRepository;
+use Nils\QuizTee\web\Middleware;
 
 class QuestionService
 {
     private QuestionRepository $questionRepository;
-    private SessionStorage $sessionStorage;
+    private SessionRepository $sessionRepository;
+    private SessionQuestionRepository $sessionQuestionRepository;
+    protected TokenRepository $tokenRepository;
 
-    public function __construct(QuestionRepository $questionRepository = new QuestionRepository())
+    public function __construct(
+        QuestionRepository        $questionRepository = new QuestionRepository(),
+        SessionRepository         $sessionRepository = new SessionRepository(),
+        SessionQuestionRepository $sessionQuestionRepository = new SessionQuestionRepository(),
+        TokenRepository           $tokenRepository = new TokenRepository()
+    )
     {
-        // would normally do this with DI, but in this small example this should be sufficient
         $this->questionRepository = $questionRepository;
-        $this->sessionStorage = new SessionStorage();
+        $this->sessionRepository = $sessionRepository;
+        $this->sessionQuestionRepository = $sessionQuestionRepository;
+        $this->tokenRepository = $tokenRepository;
     }
 
-    public function start(): QuestionEntity
+    public function start(TokenEntity $tokenEntity): QuestionEntity
     {
-//        $this->sessionStorage->resetQuiz();
+        $session = $this->getCurrentSession($tokenEntity);
+        if ($session !== null) {
+            throw new QuizAlreadyInProgressException();
+        }
 
-        return $this->questionRepository->findFirst();
+        $session = $this->sessionRepository->create($this->getToken());
+
+        $startQuestion = $this->questionRepository->findFirst();
+        $this->sessionQuestionRepository->create($startQuestion, $session);
+
+        return $startQuestion;
+    }
+
+    private function getToken(): TokenEntity
+    {
+        $jwt = Middleware::getApiKey(request());
+
+        $token = $this->tokenRepository->findOneBy(['jwt' => $jwt]);
+        if ($token === null) {
+            throw new UnauthorizedHttpException();
+        }
+
+        return $token;
     }
 
     public function answer(array $answerIds): void
@@ -56,5 +92,10 @@ class QuestionService
         }
 
         return $nextQuestion;
+    }
+
+    private function getCurrentSession(TokenEntity $tokenEntity): ?SessionEntity
+    {
+        return $this->sessionRepository->findOneBy(['token' => $tokenEntity, 'finished' => 'false']);
     }
 }

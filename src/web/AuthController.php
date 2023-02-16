@@ -2,26 +2,27 @@
 
 namespace Nils\QuizTee\web;
 
-use Nils\QuizTee\util\SessionStorage;
+use Nils\QuizTee\persistence\repository\TokenRepository;
 use ReallySimpleJWT\Token;
 
 class AuthController
 {
     // TODO: add some config files for the secret
-    private string $secret = 'super-secret';
+    private string $secret = 'sec!ReT423*&';
+    private int $year = 31_536_000;
 
-    private SessionStorage $sessionStorage;
+    private TokenRepository $tokenRepository;
 
-    public function __construct()
+    public function __construct(TokenRepository $tokenRepository = new TokenRepository())
     {
-        $this->sessionStorage = new SessionStorage();
+        $this->tokenRepository = $tokenRepository;
     }
 
     public function login(string $user)
     {
-        $token = Token::create($user, $this->secret, time() + 9999999, 'quiz');
+        $token = Token::create($user, $this->secret, time() + $this->year, 'quiz');
 
-        $this->sessionStorage->startSession();
+        $this->tokenRepository->create($token);
 
         return $token;
     }
