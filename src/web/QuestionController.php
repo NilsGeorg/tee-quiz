@@ -33,7 +33,7 @@ class QuestionController
 
     public function next()
     {
-        $question = $this->questionService->getNextQuestion();
+        $question = $this->questionService->getNextQuestion($this->getToken());
         return json_encode(new QuestionResponse($question), true);
     }
 
@@ -52,13 +52,14 @@ class QuestionController
     {
         $this->answer();
 
-        $question = $this->questionService->getNextQuestion();
+        $question = $this->questionService->getNextQuestion($this->getToken());
         if ($question !== null) {
             return json_encode(new QuestionResponse($question), true);
         } else {
             // Won't go for correct hateoas so just redirect to the finish
             // also should be replaced by named route
             redirect('/question/summary');
+            return '';
         }
     }
 

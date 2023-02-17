@@ -72,7 +72,6 @@ class QuestionService
     public function answer(TokenEntity $tokenEntity, AnswerRequest $answerPosition): void
     {
         $session = $this->getCurrentSession($tokenEntity);
-
         if ($session === null) {
             throw new NoQuizInProgressException();
         }
@@ -80,7 +79,7 @@ class QuestionService
         /**
          * @var $openQuestion SessionQuestionEntity
          */
-        $openQuestion = $this->sessionQuestionRepository->findOneBy(['session' => $session, 'answered' => false]);
+        $openQuestion = $this->getOpenQuestion($session);
         if ($openQuestion === null) {
             throw new BadRequestHttpException();
         }
@@ -95,35 +94,39 @@ class QuestionService
         $this->sessionQuestionRepository->addAnswer($openQuestion, $answers);
     }
 
-    public function getNextQuestion(): ?QuestionEntity
+    public function getNextQuestion(TokenEntity $tokenEntity): ?QuestionEntity
     {
-        $nextQuestion = $this->getNext();
-
-        if ($nextQuestion !== null) {
-            $this->sessionStorage->setCurrentQuestionNumber($nextQuestion->getOrder());
+        $session = $this->getCurrentSession($tokenEntity);
+        if ($session === null) {
+            throw new NoQuizInProgressException();
         }
 
-        return $nextQuestion;
-    }
-
-    private function getNext(): ?QuestionEntity
-    {
-        $currentQuestionOrder = $this->sessionStorage->getCurrentQuestionNumber();
-
-        /**
-         * @var $nextQuestion QuestionEntity
-         */
-        if ($currentQuestionOrder === null) {
-            $nextQuestion = $this->questionRepository->findFirst();
-        } else {
-            $nextQuestion = $this->questionRepository->findNext($currentQuestionOrder);
+        $openQuestion = $this->getOpenQuestion($session);
+        if ($openQuestion !== null) {
+            return $openQuestion->getQuestion();
         }
 
-        return $nextQuestion;
+        return $this->getLatestQuestion($session);
     }
 
     private function getCurrentSession(TokenEntity $tokenEntity): ?SessionEntity
     {
         return $this->sessionRepository->findOneBy(['token' => $tokenEntity, 'finished' => false]);
+    }
+
+    /**
+     * @param SessionEntity $session
+     * @return object|null
+     */
+    private function getOpenQuestion(SessionEntity $session): ?SessionQuestionEntity
+    {
+        return $this->sessionQuestionRepository->findOneBy(['session' => $session, 'answered' => false]);
+    }
+
+    private function getLatestQuestion(SessionEntity $session): ?QuestionEntity
+    {
+        $currentPosition = $this->sessionQuestionRepository->findHighestPositionBySession($session);
+
+        return $this->questionRepository->findOneBy(['orderIndex' => $currentPosition + 1]);
     }
 }

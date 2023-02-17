@@ -3,6 +3,7 @@
 namespace Nils\QuizTee\persistence\repository;
 
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Query\ResultSetMapping;
 use Nils\QuizTee\persistence\entity\AnswerEntity;
 use Nils\QuizTee\persistence\entity\QuestionEntity;
 use Nils\QuizTee\persistence\entity\SessionEntity;
@@ -44,5 +45,16 @@ class SessionQuestionRepository extends AbstractRepository
         $sessionQuestion->setAnswered(true);
 
         $this->getEntityManager()->flush();
+    }
+
+    public function findHighestPositionBySession(SessionEntity $sessionEntity)
+    {
+        $rsm = new ResultSetMapping();
+        $query = $this->getEntityManager()
+            ->createNativeQuery('SELECT MAX(q.orderIndex) FROM session_question sq ' .
+                ' JOIN question q on q.id = sq.question_id WHERE session_id = ?', $rsm);
+        $query->setParameter(1, $sessionEntity->getId());
+
+        return $query->getScalarResult();
     }
 }
