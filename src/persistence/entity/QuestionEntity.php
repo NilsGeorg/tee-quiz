@@ -8,7 +8,7 @@ use Nils\QuizTee\persistence\repository\QuestionRepository;
 
 #[ORM\Entity(repositoryClass: QuestionRepository::class)]
 #[ORM\Table(name: 'question')]
-final class QuestionEntity extends BaseEntity
+class QuestionEntity extends BaseEntity
 {
     #[ORM\Column(type: 'string')]
     private string $question;

@@ -2,8 +2,11 @@
 
 namespace Nils\QuizTee\domain;
 
+use Nils\QuizTee\exception\BadRequestHttpException;
+use Nils\QuizTee\exception\NoQuizInProgressException;
 use Nils\QuizTee\exception\QuizAlreadyInProgressException;
 use Nils\QuizTee\exception\UnauthorizedHttpException;
+use Nils\QuizTee\persistence\entity\AnswerEntity;
 use Nils\QuizTee\persistence\entity\QuestionEntity;
 use Nils\QuizTee\persistence\entity\SessionEntity;
 use Nils\QuizTee\persistence\entity\SessionQuestionEntity;
@@ -12,6 +15,7 @@ use Nils\QuizTee\persistence\repository\QuestionRepository;
 use Nils\QuizTee\persistence\repository\SessionQuestionRepository;
 use Nils\QuizTee\persistence\repository\SessionRepository;
 use Nils\QuizTee\persistence\repository\TokenRepository;
+use Nils\QuizTee\web\dto\AnswerRequest;
 use Nils\QuizTee\web\Middleware;
 
 class QuestionService
@@ -61,10 +65,34 @@ class QuestionService
         return $token;
     }
 
-    public function answer(array $answerIds): void
+    /**
+     * @param AnswerRequest $answerPosition
+     * @return void
+     */
+    public function answer(TokenEntity $tokenEntity, AnswerRequest $answerPosition): void
     {
-        $currentQuestionOrder = $this->sessionStorage->getCurrentQuestionNumber();
-        $this->sessionStorage->addAnswer($currentQuestionOrder, $answerIds);
+        $session = $this->getCurrentSession($tokenEntity);
+
+        if ($session === null) {
+            throw new NoQuizInProgressException();
+        }
+
+        /**
+         * @var $openQuestion SessionQuestionEntity
+         */
+        $openQuestion = $this->sessionQuestionRepository->findOneBy(['session' => $session, 'answered' => false]);
+        if ($openQuestion === null) {
+            throw new BadRequestHttpException();
+        }
+
+        $answers = $openQuestion
+            ->getQuestion()
+            ->getAnswers()
+            ->filter(function (AnswerEntity $answer) use ($answerPosition) {
+                return in_array($answer->getOrderIndex(), $answerPosition->getPositions());
+            });
+
+        $this->sessionQuestionRepository->addAnswer($openQuestion, $answers);
     }
 
     public function getNextQuestion(): ?QuestionEntity
@@ -96,6 +124,6 @@ class QuestionService
 
     private function getCurrentSession(TokenEntity $tokenEntity): ?SessionEntity
     {
-        return $this->sessionRepository->findOneBy(['token' => $tokenEntity, 'finished' => 'false']);
+        return $this->sessionRepository->findOneBy(['token' => $tokenEntity, 'finished' => false]);
     }
 }

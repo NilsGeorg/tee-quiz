@@ -12,7 +12,7 @@ class AnswerEntity extends BaseEntity
     #[ORM\Column(type: 'string')]
     private string $answer;
     #[ORM\Column(type: 'boolean')]
-    private bool $isCorrect;
+    private bool $correct;
     #[ORM\Column(type: 'integer')]
     private int $orderIndex;
 
@@ -40,15 +40,15 @@ class AnswerEntity extends BaseEntity
      */
     public function isCorrect(): bool
     {
-        return $this->isCorrect;
+        return $this->correct;
     }
 
     /**
-     * @param bool $isCorrect
+     * @param bool $correct
      */
-    public function setIsCorrect(bool $isCorrect): void
+    public function setCorrect(bool $correct): void
     {
-        $this->isCorrect = $isCorrect;
+        $this->correct = $correct;
     }
 
     /**

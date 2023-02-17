@@ -2,6 +2,7 @@
 
 namespace Nils\QuizTee\persistence\entity;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Nils\QuizTee\persistence\repository\SessionQuestionRepository;
 
@@ -9,14 +10,36 @@ use Nils\QuizTee\persistence\repository\SessionQuestionRepository;
 #[ORM\Table(name: 'session_question')]
 class SessionQuestionEntity extends BaseEntity
 {
+    #[ORM\Column(type: 'boolean')]
+    private bool $answered = false;
+
     #[ORM\ManyToOne(targetEntity: QuestionEntity::class)]
     private QuestionEntity $question;
 
-    #[ORM\ManyToOne(targetEntity: AnswerEntity::class)]
-    private ?AnswerEntity $answer;
+    #[ORM\JoinTable(name: 'session_answers')]
+    #[ORM\JoinColumn(referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(referencedColumnName: 'id')]
+    #[ORM\ManyToMany(targetEntity: AnswerEntity::class)]
+    private Collection $answers;
 
     #[ORM\ManyToOne(targetEntity: SessionEntity::class)]
-    private SessionEntity $sessionEntity;
+    private SessionEntity $session;
+
+    /**
+     * @return bool
+     */
+    public function isAnswered(): bool
+    {
+        return $this->answered;
+    }
+
+    /**
+     * @param bool $answered
+     */
+    public function setAnswered(bool $answered): void
+    {
+        $this->answered = $answered;
+    }
 
     /**
      * @return QuestionEntity
@@ -35,34 +58,34 @@ class SessionQuestionEntity extends BaseEntity
     }
 
     /**
-     * @return AnswerEntity|null
-     */
-    public function getAnswer(): ?AnswerEntity
-    {
-        return $this->answer;
-    }
-
-    /**
-     * @param AnswerEntity|null $answer
-     */
-    public function setAnswer(?AnswerEntity $answer): void
-    {
-        $this->answer = $answer;
-    }
-
-    /**
      * @return SessionEntity
      */
-    public function getSessionEntity(): SessionEntity
+    public function getSession(): SessionEntity
     {
-        return $this->sessionEntity;
+        return $this->session;
     }
 
     /**
-     * @param SessionEntity $sessionEntity
+     * @param SessionEntity $session
      */
-    public function setSessionEntity(SessionEntity $sessionEntity): void
+    public function setSession(SessionEntity $session): void
     {
-        $this->sessionEntity = $sessionEntity;
+        $this->session = $session;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getAnswers(): Collection
+    {
+        return $this->answers;
+    }
+
+    /**
+     * @param Collection $answers
+     */
+    public function setAnswers(Collection $answers): void
+    {
+        $this->answers = $answers;
     }
 }

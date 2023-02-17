@@ -2,6 +2,8 @@
 
 namespace Nils\QuizTee\persistence\repository;
 
+use Doctrine\Common\Collections\Collection;
+use Nils\QuizTee\persistence\entity\AnswerEntity;
 use Nils\QuizTee\persistence\entity\QuestionEntity;
 use Nils\QuizTee\persistence\entity\SessionEntity;
 use Nils\QuizTee\persistence\entity\SessionQuestionEntity;
@@ -20,11 +22,27 @@ class SessionQuestionRepository extends AbstractRepository
 
         $question = new SessionQuestionEntity();
         $question->setQuestion($questionEntity);
-        $question->setSessionEntity($sessionEntity);
+        $question->setSession($sessionEntity);
 
         $this->getEntityManager()->persist($question);
         $this->getEntityManager()->flush();
 
         return $question;
+    }
+
+    public function addAnswer(SessionQuestionEntity $sessionQuestion, Collection $answers)
+    {
+        $answers = $answers->map(function (AnswerEntity $answer) {
+            return $this->getEntityManager()->find(AnswerEntity::class, $answer->getId());
+        });
+
+        /**
+         * @var $sessionQuestion SessionQuestionEntity
+         */
+        $sessionQuestion = $this->find($sessionQuestion->getId());
+        $sessionQuestion->setAnswers($answers);
+        $sessionQuestion->setAnswered(true);
+
+        $this->getEntityManager()->flush();
     }
 }

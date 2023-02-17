@@ -3,14 +3,15 @@
 namespace Nils\QuizTee\web;
 
 use Nils\QuizTee\domain\QuestionService;
+use Nils\QuizTee\exception\BadRequestHttpException;
 use Nils\QuizTee\exception\UnauthorizedHttpException;
 use Nils\QuizTee\persistence\entity\TokenEntity;
 use Nils\QuizTee\persistence\repository\TokenRepository;
+use Nils\QuizTee\web\dto\AnswerRequest;
 use Nils\QuizTee\web\dto\QuestionResponse;
 
 class QuestionController
 {
-
     protected QuestionService $questionService;
     protected TokenRepository $tokenRepository;
 
@@ -38,12 +39,13 @@ class QuestionController
 
     public function answer()
     {
-        // Should throw an exception if no answers are passed
-        //if(input()->exists("answers"))
+        if (!input()->exists("answers")) {
+            throw new BadRequestHttpException();
+        }
 
-        // could be transformed into a dto
-        $answersIds = input("answers");
-        $this->questionService->answer($answersIds);
+        $request = AnswerRequest::from(input("answers"));
+
+        $this->questionService->answer($this->getToken(), $request);
     }
 
     public function answerAndNext(): string

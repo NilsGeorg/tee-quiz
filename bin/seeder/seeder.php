@@ -23,7 +23,7 @@ foreach ($seeds as $seed) {
     foreach ($rawAnswers as $rawAnswer) {
         $answer = new AnswerEntity();
         $answer->setQuestion($question);
-        $answer->setIsCorrect($rawAnswer['isCorrect']);
+        $answer->setCorrect($rawAnswer['isCorrect']);
         $answer->setAnswer($rawAnswer['answer']);
         $answer->setOrderIndex(++$answerIndex);
 
