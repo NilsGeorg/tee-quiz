@@ -2,7 +2,12 @@
 
 namespace Nils\QuizTee\exception;
 
-class QuizAlreadyInProgressException extends \Exception
-{
+use Throwable;
 
+class QuizAlreadyInProgressException extends BadRequestHttpException
+{
+    public function __construct()
+    {
+        parent::__construct('There is already a quiz in progress. Please finish this at first!');
+    }
 }
