@@ -24,4 +24,17 @@ class SessionRepository extends AbstractRepository
 
         return $session;
     }
+
+    public function close(SessionEntity $sessionEntity): SessionEntity
+    {
+        /**
+         * @var $sessionEntity SessionEntity
+         */
+        $sessionEntity = $this->find($sessionEntity->getId());
+        $sessionEntity->setFinished(true);
+
+        $this->getEntityManager()->flush();
+
+        return $sessionEntity;
+    }
 }

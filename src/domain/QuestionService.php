@@ -109,6 +109,53 @@ class QuestionService
         return $this->getLatestQuestion($session);
     }
 
+    public function createSummary(TokenEntity $tokenEntity): Summary
+    {
+        $session = $this->getCurrentSession($tokenEntity);
+        if ($session === null) {
+            throw new NoQuizInProgressException();
+        }
+
+        $this->sessionRepository->close($session);
+
+        $sessionQuestions = $this->sessionQuestionRepository->findBy(['session' => $session]);
+
+        $summary = new Summary();
+        foreach ($sessionQuestions as $sessionQuestion) {
+            $summary->addSummaryItem($this->createSummaryItem($sessionQuestion));
+        }
+
+        return $summary;
+    }
+
+    private function createSummaryItem(SessionQuestionEntity $sessionQuestion): SummaryItem
+    {
+        $points = 0;
+
+        $correctAnswers = $sessionQuestion
+            ->getQuestion()
+            ->getAnswers()
+            ->filter(function (AnswerEntity $answer) {
+                return $answer->isCorrect();
+            })
+        ->map(function (AnswerEntity $answerEntity) {
+            return $answerEntity->getId();
+        });
+
+        foreach ($sessionQuestion->getAnswers() as $givenAnswer) {
+            if (in_array($givenAnswer->getId(), $correctAnswers)) {
+                ++$points;
+            }
+        }
+
+        $summary = new SummaryItem();
+        $summary->setQuestionEntity($sessionQuestion->getQuestion());
+        $summary->setGivenAnswers($correctAnswers->toArray());
+        $summary->setPoints($points);
+
+        return $summary;
+    }
+
     private function getCurrentSession(TokenEntity $tokenEntity): ?SessionEntity
     {
         return $this->sessionRepository->findOneBy(['token' => $tokenEntity, 'finished' => false]);

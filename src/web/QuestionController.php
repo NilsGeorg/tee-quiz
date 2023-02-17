@@ -9,6 +9,7 @@ use Nils\QuizTee\persistence\entity\TokenEntity;
 use Nils\QuizTee\persistence\repository\TokenRepository;
 use Nils\QuizTee\web\dto\AnswerRequest;
 use Nils\QuizTee\web\dto\QuestionResponse;
+use Nils\QuizTee\web\dto\SummaryResponse;
 
 class QuestionController
 {
@@ -63,9 +64,11 @@ class QuestionController
         }
     }
 
-    public function summary()
+    public function summary(): SummaryResponse
     {
-        // Todo: Calculate points and print the answers
+        $summary = $this->questionService->createSummary($this->getToken());
+
+        return SummaryResponse::from($summary);
     }
 
     private function getToken(): TokenEntity

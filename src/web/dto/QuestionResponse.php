@@ -5,7 +5,7 @@ namespace Nils\QuizTee\web\dto;
 use Nils\QuizTee\persistence\entity\QuestionEntity;
 use Nils\QuizTee\web\AbstractResponse;
 
-class QuestionResponse extends AbstractResponse
+class QuestionResponse
 {
     protected string $question;
 
